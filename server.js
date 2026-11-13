@@ -24,23 +24,79 @@ app.get("/citations", (req, res) => {
 });
 
 app.get("/citations/:id", (req, res) => {
-  // TODO : convertir l’ID en nombre, chercher la citation et gérer son absence.
-  res.status(501).json({ message: "À compléter" });
+  const id = Number(req.params.id);
+  const citation = citations.find((element) => element.id === id);
+
+  if (!citation) {
+    return res.status(404).json({ message: "Citation introuvable" });
+  }
+
+  res.json(citation);
 });
 
 app.post("/citations", (req, res) => {
-  // TODO : valider req.body, créer une citation et incrémenter prochainId.
-  res.status(501).json({ message: "À compléter" });
+  const { texte, auteur } = req.body ?? {};
+
+  if (
+    typeof texte !== "string" ||
+    typeof auteur !== "string" ||
+    texte.trim() === "" ||
+    auteur.trim() === ""
+  ) {
+    return res
+      .status(400)
+      .json({ message: "Texte et auteur sont obligatoires" });
+  }
+
+  const citation = {
+    id: prochainId,
+    texte: texte.trim(),
+    auteur: auteur.trim(),
+  };
+
+  prochainId++;
+  citations.push(citation);
+
+  res.status(201).json(citation);
 });
 
 app.put("/citations/:id", (req, res) => {
-  // TODO : retrouver la citation et remplacer texte et auteur après validation.
-  res.status(501).json({ message: "À compléter" });
+  const id = Number(req.params.id);
+  const citation = citations.find((element) => element.id === id);
+
+  if (!citation) {
+    return res.status(404).json({ message: "Citation introuvable" });
+  }
+
+  const { texte, auteur } = req.body ?? {};
+
+  if (
+    typeof texte !== "string" ||
+    typeof auteur !== "string" ||
+    texte.trim() === "" ||
+    auteur.trim() === ""
+  ) {
+    return res
+      .status(400)
+      .json({ message: "Texte et auteur sont obligatoires" });
+  }
+
+  citation.texte = texte.trim();
+  citation.auteur = auteur.trim();
+
+  res.json(citation);
 });
 
 app.delete("/citations/:id", (req, res) => {
-  // TODO : retirer la citation du tableau et terminer la réponse.
-  res.status(501).json({ message: "À compléter" });
+  const id = Number(req.params.id);
+  const index = citations.findIndex((element) => element.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ message: "Citation introuvable" });
+  }
+
+  citations.splice(index, 1);
+  res.status(204).end();
 });
 
 app.listen(3000, () => {
